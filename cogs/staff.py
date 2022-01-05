@@ -40,9 +40,7 @@ class Staff(commands.Cog):
             emb.add_field(name=tsk.type.capitalize(), value=val, inline=False)
 
         await msg.edit(content=None, embed=emb)
-        
-
-
+   
 
 def setup(client):
     client.add_cog(Staff(client))

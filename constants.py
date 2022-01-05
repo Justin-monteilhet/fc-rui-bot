@@ -9,8 +9,8 @@ PLANNING_ROW_RANGE = (3, 9)     # included
 PLANNING_START_COL = 'B'
 PLANNING_TASKS_ORDER = ['traduction', 'clean', 'redraw', 'correction', 'edit', 'verification']
 
-STAFF_ROLE = '923724925523603496'
-FCRUI_ROLE = '923724998420623360'
+STAFF_ROLE = '807327896040898572'
+FCRUI_ROLE = '807327896028840019'
 
 PERMISSION_LEVELS = ['member', 'fcrui', 'staff']
 

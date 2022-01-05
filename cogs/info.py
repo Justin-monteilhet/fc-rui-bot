@@ -1,11 +1,15 @@
-from discord.ext import commands
-from discord import Embed, Color
+from discord.ext import commands, tasks
+from discord import Embed, Color, Game, Status
 
 from utils import *
 
-class Manga(commands.Cog):
+class Info(commands.Cog):
     def __init__(self, client):
         self.client = client
+    
+    @commands.Cog.listener()
+    async def on_ready(self):
+        self.update_activity.start()
 
     @commands.command(name='read',
                       usage='read <numéro du chapitre>',
@@ -64,9 +68,15 @@ class Manga(commands.Cog):
             emb.add_field(name=site.capitalize(), value=f"[Lire le chapitre]({url})", inline=False)
 
         await ctx.send(embed=emb)
+    
+    @tasks.loop(hours=1.0)
+    async def update_activity(self):
+        last_chap = get_last_chapter_data()['attributes']['chapter']
+        act = Game(name=f"Lisez le chapitre {last_chap} de DNK sur Mangadex et Japanread !")
+        await self.client.change_presence(status=Status.idle, activity=act)
 
 def setup(client):
-    client.add_cog(Manga(client))
+    client.add_cog(Info(client))
 
 
 # add someone to the team

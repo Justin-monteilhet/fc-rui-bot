@@ -26,8 +26,6 @@ bot.on_command_error = on_command_error
 @bot.event
 async def on_ready():
     print(f'{datetime.now()} - Connected as {bot.user}')
-    act = discord.Game(name=f"fc!help")
-    await bot.change_presence(activity=act)
 
 @bot.command(name="help", description="Envoie ce message", usage="help", aliases=[])
 async def help_(ctx):
@@ -39,15 +37,17 @@ async def help_(ctx):
     for cmd in bot.commands:
         if not is_command_authorized(ctx.author, cmd) : continue
 
+        name = f"{cmd.name.capitalize()} (``{bot.command_prefix + cmd.name}``)"
         aliases = ", ".join(cmd.aliases)
         content = f"{cmd.description}\n**Usage :**  {bot.command_prefix + cmd.usage}"
         if aliases : content += f"\n**Aliases :**  {aliases}"
 
-        embed.add_field(name=cmd.name,
+        embed.add_field(name=name,
                         value=content,
                         inline=False)
 
     await ctx.send(embed=embed)
+
 
 
 

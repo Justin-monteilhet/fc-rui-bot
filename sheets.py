@@ -14,43 +14,13 @@ service = discovery.build('sheets', 'v4', credentials=creds)
 sheets = service.spreadsheets()
 
 
-class Color:
-    def __init__(self, col:Tuple[float, float, float]) -> None:
-        self.red, self.green, self.blue = self.rgb = tuple(map(float, col))
-
-    @classmethod
-    def from_rgb_dict(cls, d:dict):
-        color = []
-        for col in ['red', 'green', 'blue']:
-            if col in d:
-                color.append(d[col])
-                continue
-            color.append(0.)
-
-        return cls(tuple(color))
-    
-    def __str__(self) -> str:
-        return self.rgb.__str__()
-
-class SheetCell:
-    def __init__(self, value:str, bgColor:Tuple[float, float, float]) -> None:
-        self.value = value
-        self.bgColor = Color.from_rgb_dict(bgColor)
-    
-    @classmethod
-    def from_dict(cls, d:dict):
-        value = d.get('formattedValue', None)
-        try : col = d['effectiveFormat']['backgroundColor']
-        except : col = None
-        return cls(value, col)
-
+class SheetData:
     def __str__(self) -> str:
         return f"<{self.__class__.__name__} value={self.value} bgColor={self.bgColor}>"
     
     def __repr__(self) -> str:
         return self.__str__()
 
-class SheetData:
     def __init__(self, row_values):
         self.row_values = row_values
         self.cells = []
@@ -101,6 +71,25 @@ class SheetData:
         if column:
             return ChapterData(num, column)
 
+class SheetCell:
+    def __init__(self, value:str, bgColor:Tuple[float, float, float]) -> None:
+        self.value = value
+        self.bgColor = Color.from_rgb_dict(bgColor)
+    
+    @classmethod
+    def from_dict(cls, d:dict):
+        value = d.get('formattedValue', None)
+        try : col = d['effectiveFormat']['backgroundColor']
+        except : col = None
+        return cls(value, col)
+
+class ChapterData:
+    def __init__(self, chap_num:int, cells:List[SheetCell]) -> None:
+        self.tasks:List[Task] = []
+        for task_name, cell in zip(PLANNING_TASKS_ORDER, cells):
+            tsk = Task(chap_num, worker=cell.value, type_=task_name, state=rgb_to_chap_state(cell.bgColor))
+            self.tasks.append(tsk)
+
 class Task:
     def __init__(self, chapter:int, worker:str, type_:str, state:ChapterState) -> None:
         self.chapter = chapter
@@ -114,13 +103,20 @@ class Task:
     def __str__(self) -> str:
         return f"<Chapter {self.chapter} {self.type} from {self.worker} : {self.state}"
 
-class ChapterData:
-    def __init__(self, chap_num:int, cells:List[SheetCell]) -> None:
-        self.tasks:List[Task] = []
-        for task_name, cell in zip(PLANNING_TASKS_ORDER, cells):
-            tsk = Task(chap_num, worker=cell.value, type_=task_name, state=rgb_to_chap_state(cell.bgColor))
-            self.tasks.append(tsk)
+class Color:
+    def __init__(self, col:Tuple[float, float, float]) -> None:
+        self.red, self.green, self.blue = self.rgb = tuple(map(float, col))
 
+    @classmethod
+    def from_rgb_dict(cls, d:dict):
+        color = []
+        for col in ['red', 'green', 'blue']:
+            if col in d:
+                color.append(d[col])
+                continue
+            color.append(0.)
 
-# then link colors to states of chapter and send through embed
-# add someone to the team, link to doc
+        return cls(tuple(color))
+    
+    def __str__(self) -> str:
+        return self.rgb.__str__()
