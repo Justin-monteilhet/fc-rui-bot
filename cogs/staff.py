@@ -22,15 +22,24 @@ class Staff(commands.Cog):
             await ctx.send(embed=emb)
             return
         
-        chap_data = SheetData.from_id(PLANNING_DOC_ID).get_chapter_data(chap)
+        msg = await ctx.send("<a:loader:928387309538279484> Please wait...")
+        
+        sheet = SheetData.from_id(PLANNING_DOC_ID)
+        chap_data = sheet.get_chapter_data(chap)
         if not chap_data:
             emb = make_error_embed(f"Le chapitre {chap} n'existe pas sur le google doc.")
-            await ctx.send(embed=emb)
+            await msg.edit(content=None, embed=emb)
             return
         
-        print(chap_data)
-        # send loading message to update when data found
-        # format embed of the chapter's tasks
+        emb = Embed(color=Color.dark_green())
+        emb.set_author(name=f"Chapitre {chap}")
+        for tsk in chap_data.tasks:
+            state_emote = chap_state_to_emote(tsk.state)
+            worker = tsk.worker.capitalize() if tsk.worker else 'non réservé(e)'
+            val = f"{state_emote} **{worker}**"
+            emb.add_field(name=tsk.type.capitalize(), value=val, inline=False)
+
+        await msg.edit(content=None, embed=emb)
         
 
 

@@ -93,8 +93,7 @@ class SheetData:
             if chap_num_cell.value == str(num):
                 col_index = i
                 break
-        
-        if col_index:
+        if col_index is not None:
             return [row[col_index] for row in self.cells[1:]]
 
     def get_chapter_data(self, num:int):

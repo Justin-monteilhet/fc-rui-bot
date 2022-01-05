@@ -69,4 +69,4 @@ def setup(client):
     client.add_cog(Manga(client))
 
 
-# add someone to the team, link to doc
+# add someone to the team

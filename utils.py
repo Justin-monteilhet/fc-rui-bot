@@ -3,7 +3,7 @@ from math import log, ceil
 
 from discord import Member, Embed, Color
 
-from constants import PERMISSION_LEVELS, STAFF_ROLE, FCRUI_ROLE, Done, InProgress, NotStarted
+from constants import PERMISSION_LEVELS, STAFF_ROLE, FCRUI_ROLE, Done, InProgress, NotStarted, ChapterState
 
 def make_error_embed(desc:str):
     return Embed(title="Erreur",
@@ -80,9 +80,17 @@ def int_to_sheet_row(n:int):
     return row
 
 def rgb_to_chap_state(rgb):
+
     if rgb.green == 1:
         return Done
     if rgb.red == 1:
         if rgb.green > 0:
             return InProgress
         return NotStarted
+
+def chap_state_to_emote(state:ChapterState):
+    if state == Done:
+        return ':green_square:'
+    if state == InProgress:
+        return ':orange_square:'
+    return ':red_square:'
